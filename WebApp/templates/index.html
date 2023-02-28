@@ -3,22 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Welcome to My Website</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <!-- Custom CSS -->
     <style>
         body {
             background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
         }
 
-        .container {
+        .jumbotron {
+            background-image: url('https://picsum.photos/id/237/1920/1080');
+            background-size: cover;
+            color: #fff;
+            text-shadow: 2px 2px 4px #000000;
             margin-top: 100px;
+        }
+
+        .jumbotron h1 {
+            font-weight: bold;
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .jumbotron p {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         .btn {
             border-radius: 0;
             font-weight: bold;
+            margin-right: 10px;
             margin-bottom: 10px;
         }
 
@@ -44,26 +63,24 @@
             border-color: #3498db;
             color: #fff;
         }
+
     </style>
 </head>
 <body>
+<div class="jumbotron">
     <div class="container">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <div class="text-center">
-                    <h1>Welcome to my website</h1>
-                    <p>Please select an option below to get started.</p>
-                </div>
-                <div class="text-center">
-                    <a href="{{url_for('login')}}" class="btn btn-lg btn-block login-btn">Login</a>
-                    <a href="{{url_for('register')}}" class="btn btn-lg btn-block register-btn">Register</a>
-                </div>
-            </div>
+        <h1>Welcome to My Website</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla euismod risus vel enim pharetra, id
+            consectetur lacus malesuada. Integer ultrices ullamcorper massa, eu fringilla arcu auctor eu.</p>
+        <div class="text-center">
+            <a href="{{ url_for('login') }}" class="btn btn-lg login-btn">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-lg register-btn">Register</a>
         </div>
     </div>
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>
