@@ -8,7 +8,7 @@ class UserData(BaseModel):
 
 
 class UserDataResponse(BaseModel):
-    name: str
+    user_name: str
     email: EmailStr
 
     class Config:
