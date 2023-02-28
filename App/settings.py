@@ -1,20 +1,15 @@
 from pydantic import BaseSettings
 
 
-class Settings(BaseSettings):
+class Variables(BaseSettings):
     DATABASE_NAME: str
     DATABASE_HOSTNAME: str
-    DATABASE_PORT: str
+    DATABASE_PORT: int
     DATABASE_PASSWORD: str
     DATABASE_USERNAME: str
-    SECRET_KEY: str
-    ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     class Config:
         env_file = ".env"
 
 
-variables = Settings()
-print(variables.ACCESS_TOKEN_EXPIRE_MINUTES)
-
+variables = Variables()

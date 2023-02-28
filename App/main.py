@@ -1,9 +1,6 @@
 import sys
-
 from sqlalchemy.orm import Session
-
 from App import models
-
 sys.path.append('D:\\UI\\Python\\FastApi\\App')
 from fastapi import FastAPI, Depends
 from App.database import dbase, get_db, engine
