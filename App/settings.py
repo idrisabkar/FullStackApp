@@ -7,6 +7,7 @@ class Variables(BaseSettings):
     DATABASE_PORT: int
     DATABASE_PASSWORD: str
     DATABASE_USERNAME: str
+    SECRET_KEY: str
 
     class Config:
         env_file = ".env"
