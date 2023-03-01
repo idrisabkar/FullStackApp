@@ -1,6 +1,5 @@
 from functools import wraps
-
-from flask import Flask, render_template, redirect, request, jsonify
+from flask import Flask, render_template, redirect, request, jsonify, url_for
 import requests
 import jwt
 
@@ -40,7 +39,7 @@ def home():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        pass
+        return redirect(url_for("wellcome"))
     return render_template("login.html")
 
 
@@ -58,6 +57,12 @@ def register():
         else:
             return jsonify(status=response.status_code)
     return render_template("register.html")
+
+
+@app.route("/wellcome")
+@token_required
+def wellcome():
+    return render_template("wellcome.html")
 
 
 if __name__ == "__main__":
