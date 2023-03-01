@@ -10,6 +10,7 @@ class UserData(BaseModel):
 class UserDataResponse(BaseModel):
     user_name: str
     email: EmailStr
+    password: str
 
     class Config:
         orm_mode = True

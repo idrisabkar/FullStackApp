@@ -39,7 +39,17 @@ def home():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        return redirect(url_for("wellcome"))
+        email = request.form["email"]
+        password = request.form["password"]
+        response = requests.get("http://127.0.0.1:8000/user", json={"email": email})
+        if response.status_code == 200:
+            user = response.json()
+            if utils.verified(p_password=password, h_password=user.get("email")):
+                return redirect(url_for("wellcome"))
+            else:
+                return "Invalid email or password"
+        else:
+            return "Invalid email or password"
     return render_template("login.html")
 
 
@@ -55,7 +65,8 @@ def register():
         if response.status_code == 200:
             return render_template("login.html")
         else:
-            return jsonify(status=response.status_code)
+            return jsonify(response.status_code, response.json())
+
     return render_template("register.html")
 
 
