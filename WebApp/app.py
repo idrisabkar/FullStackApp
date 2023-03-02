@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from functools import wraps
 from flask import Flask, render_template, redirect, request, jsonify, url_for, flash
 import requests
@@ -47,7 +48,12 @@ def login():
             data = response.json()
             if "password" in data and data["password"] and utils.verified(c_password=password,
                                                                           h_password=data.get("password")):
-                return "ok"
+                # generate JWT token
+                payload = {"email": email, "exp": datetime.utcnow() + timedelta(minutes=30)}
+                token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+
+                # return response with token
+                return jsonify({"token": token})
             else:
                 flash("Invalid email or password", "error")
                 return redirect("/login")
@@ -69,8 +75,8 @@ def register():
         if response.status_code == 200:
             return redirect("/login")
         else:
-            flash("Invalid email or password", "error")
-            return redirect("/login")
+            flash("Email already in use", "error")
+            return redirect("/register")
 
     return render_template("register.html")
 
