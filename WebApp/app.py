@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import Flask, render_template, redirect, request, jsonify, url_for
+from flask import Flask, render_template, redirect, request, jsonify, url_for, flash
 import requests
 import jwt
 
@@ -39,17 +39,21 @@ def home():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
+        email = request.form.get("email")
+        password = request.form.get("password")
+
         response = requests.get("http://127.0.0.1:8000/user", json={"email": email})
         if response.status_code == 200:
-            user = response.json()
-            if utils.verified(p_password=password, h_password=user.get("email")):
-                return redirect(url_for("wellcome"))
+            data = response.json()
+            if "password" in data and data["password"] and utils.verified(c_password=password,
+                                                                          h_password=data.get("password")):
+                return "ok"
             else:
-                return "Invalid email or password"
+                flash("Invalid email or password", "error")
+                return redirect("/login")
         else:
-            return "Invalid email or password"
+            flash("Invalid email or password", "error")
+            return redirect("/login")
     return render_template("login.html")
 
 
@@ -59,13 +63,14 @@ def register():
         data = {
             "user_name": request.form['name'],
             "email": request.form['email'],
-            "password": utils.encrypt(request.form['password'])
+            "password": utils.hash_password(request.form['password'])
         }
         response = requests.post("http://127.0.0.1:8000/user", json=data)
         if response.status_code == 200:
-            return render_template("login.html")
+            return redirect("/login")
         else:
-            return jsonify(response.status_code, response.json())
+            flash("Invalid email or password", "error")
+            return redirect("/login")
 
     return render_template("register.html")
 
