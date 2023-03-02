@@ -1,42 +1,55 @@
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, make_response
 import jwt
+import datetime
+from functools import wraps
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mysecretkey'
 
-@app.route('/login', methods=['POST'])
+app.config['SECRET_KEY'] = 'your_secret_key'
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(' ')[1]
+
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = User.query.filter_by(public_id=data['public_id']).first()
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
+@app.route('/login')
 def login():
-    email = request.form['email']
-    password = request.form['password']
+    auth = request.authorization
 
-    # TODO: verify the user's credentials and generate a JWT
-    user_id = 123
-    token = jwt.encode({'user_id': user_id}, app.config['SECRET_KEY'], algorithm='HS256')
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    session['token'] = token
-    return jsonify({'message': 'Login successful'}), 200
+    if auth.username == 'admin' and auth.password == 'adminpassword':
+        token = jwt.encode({'user': auth.username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+                           app.config['SECRET_KEY'], algorithm='HS256')
+        return jsonify({'token': token.decode('UTF-8')})
+
+    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
 
 @app.route('/protected')
-def protected():
-    token = session.get('token')
+@token_required
+def protected(current_user):
+    return jsonify({'message': f'Welcome {current_user.username}!'})
 
-    if not token:
-        return jsonify({'message': 'Unauthorized'}), 401
-
-    try:
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = data['user_id']
-        # TODO: use the user ID to fetch data from the database or perform other actions
-        return jsonify({'message': f'Welcome, user {user_id}!'}), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'message': 'Invalid token'}), 401
-
-@app.route('/logout')
-def logout():
-    session.pop('token', None)
-    return jsonify({'message': 'Logout successful'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

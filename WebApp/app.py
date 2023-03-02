@@ -1,35 +1,14 @@
 from datetime import datetime, timedelta
-from functools import wraps
-from flask import Flask, render_template, redirect, request, jsonify, url_for, flash
+from flask import Flask, render_template, redirect, flash, make_response, url_for
 import requests
+from flask import request
 import jwt
-
 from WebApp import utils
 from settings import variables
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = variables.SECRET_KEY
-
-
-def token_required(func):
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-
-        if not token:
-            return jsonify({'message': 'Token is missing'}), 401
-
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Token has expired'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Invalid token'}), 401
-
-        return func(*args, **kwargs)
-
-    return decorated
 
 
 @app.route("/")
@@ -48,12 +27,7 @@ def login():
             data = response.json()
             if "password" in data and data["password"] and utils.verified(c_password=password,
                                                                           h_password=data.get("password")):
-                # generate JWT token
-                payload = {"email": email, "exp": datetime.utcnow() + timedelta(minutes=30)}
-                token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
-                # return response with token
-                return jsonify({"token": token})
+                return render_template("wellcome.html", name=data["user_name"])
             else:
                 flash("Invalid email or password", "error")
                 return redirect("/login")
@@ -82,7 +56,6 @@ def register():
 
 
 @app.route("/wellcome")
-@token_required
 def wellcome():
     return render_template("wellcome.html")
 
