@@ -1,6 +1,4 @@
-import sqlalchemy
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.dialects.postgresql import psycopg2
 from sqlalchemy.orm import Session
 from App.database import get_db
 from App.schemas import UserData
